@@ -2,6 +2,7 @@ from model import RoombaSim, Dirt, Roomba, ObstacleAgent
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.modules import ChartModule
 
 def agent_portrayal(agent):
     if agent is None: return
@@ -44,9 +45,24 @@ def agent_portrayal(agent):
 
     return portrayal
 
-model_params = {"N":5, "width":20, "height":20, "density" : UserSettableParameter("slider", "cell Density", 0.1, 0.01, 0.4, 0.01)}
+"""
+Parámetros iniciales del modelo, el ancho y alto no se lograron hacer deslizadores porque
+se requiere de valores estáticos en el CanvasGrid
+"""
+model_params = {
+    "N": UserSettableParameter("slider", "Number of Roombas", 5, 1, 20, 1), 
+    "width": 15,
+    "height": 15, 
+    "density" : UserSettableParameter("slider", "Dirt Density", 0.4, 0.01, 1, 0.05),
+    "maxIterations" : UserSettableParameter("slider", "Max Iterations", 100, 10, 1000, 10)
+    }
 
-grid = CanvasGrid(agent_portrayal, 20, 20, 500, 500)
-server = ModularServer(RoombaSim, [grid], "Roomba", model_params)
+# Condiciones del gráfico
+chart = ChartModule([{"Label": "Dirty Cells",
+                      "Color": "Black"}],
+                    data_collector_name='datacollector')
+
+grid = CanvasGrid(agent_portrayal, 15, 15, 500, 500)
+server = ModularServer(RoombaSim, [grid, chart], "Roomba", model_params)
 
 server.launch()
